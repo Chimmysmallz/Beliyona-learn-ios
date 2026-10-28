@@ -1,0 +1,22 @@
+name: Check Study Egg
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: index.html matches src (run BUILD before committing)
+        run: |
+          python3 tools/build.py src /tmp/built.html
+          cmp /tmp/built.html index.html || { echo "::error::index.html is out of date. Run BUILD.bat (or ./build.sh), then commit again."; exit 1; }
+      - name: Syntax and question checks
+        run: python3 tools/check.py
+      - name: App tests
+        run: node tests/app.test.js

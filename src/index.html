@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#0b0b0f" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<title>Study Egg</title>
+<link rel="manifest" href="manifest.json" />
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-title" content="Study Egg" />
+<link rel="stylesheet" href="css/styles.css" data-inline>
+</head>
+<body>
+<canvas id="cfx"></canvas>
+<div class="toasts" id="toasts"></div>
+
+<!-- ONBOARDING / LANDING -->
+<div class="onboard hidden" id="onboard">
+  <div class="onb-box">
+    <!-- INTRO CAROUSEL -->
+    <div class="onb-step" data-step="intro">
+      <div id="introSlide" style="text-align:center"></div>
+      <div class="onb-nav"><button class="onb-link" id="introSkip">Skip</button><button class="btn" id="introNext">Next →</button></div>
+    </div>
+    <!-- STEP 0: LANDING -->
+    <div class="onb-step active" data-step="0">
+      <div class="onb-hero">
+        <div class="onb-logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2.6c-3.8 0-7 5.5-7 10.4a7 7 0 0 0 14 0c0-4.9-3.2-10.4-7-10.4z"/></svg></div>
+        <h1>Study Egg</h1>
+        <p class="onb-tag">Learning — but make it a game.</p>
+        <div class="onb-feats"><span>⚔️ Boss battles</span><span>🔥 Streaks</span><span>🏅 Compete with friends</span><span>🇳🇬 WAEC &amp; NECO + life skills</span></div>
+        <button class="btn block" id="obStart">✨ Get started</button>
+        <button class="btn ghost block" id="obSignin" style="margin-top:8px">I already have a profile</button>
+        <button class="btn ghost block" id="obGuest" style="margin-top:8px">🎮 Play as guest — no sign-up</button>
+      </div>
+    </div>
+    <!-- SIGN IN -->
+    <div class="onb-step" data-step="signin">
+      <h2>Welcome back</h2>
+      <p class="onb-sub">Sign in with the email and password you set on this device.</p>
+      <div class="field"><label>Email</label><input id="siEmail" type="email" placeholder="you@example.com"></div>
+      <div class="field"><label>Password</label><input id="siPass" type="password" placeholder="Your password"></div>
+      <button class="btn block" id="siGo">Sign in</button>
+      <div style="text-align:center;color:var(--muted);font-size:12px;margin:10px 0">— or —</div>
+      <button class="btn ghost block" id="siGoogle">Continue with Google</button>
+      <button class="btn ghost block" id="siOtpSend" style="margin-top:8px">Email me a code (no password)</button>
+      <div id="siOtpBox" class="hidden" style="margin-top:8px"><div class="field"><label>Enter the 6-digit code</label><input id="siOtpCode" inputmode="numeric" placeholder="123456"></div><button class="btn block" id="siOtpVerify">Verify & sign in</button></div>
+      <p class="onb-err" id="siErr"></p>
+      <div class="onb-nav"><button class="onb-link" data-go="0">← Back</button></div>
+    </div>
+    <!-- STEP 1: ROLE -->
+    <div class="onb-step" data-step="1">
+      <h2>Who's using Study Egg?</h2>
+      <p class="onb-sub">We'll set things up just for you.</p>
+      <div class="onb-cards">
+        <button class="onb-card" data-role="student"><span>🎓</span><div><b>Student</b><i>I'm here to learn &amp; level up</i></div></button>
+        <button class="onb-card" data-role="parent"><span>👨‍👩‍👧</span><div><b>Parent</b><i>Helping my child study</i></div></button>
+        <button class="onb-card" data-role="teacher"><span>🧑‍🏫</span><div><b>Teacher</b><i>For my class</i></div></button>
+      </div>
+    </div>
+    <!-- STEP 2: LEVEL -->
+    <div class="onb-step" data-step="2">
+      <h2 id="lvlQ">What class are you in?</h2>
+      <p class="onb-sub">Your questions will be tailored to this level.</p>
+      <div class="onb-chips" id="lvlChips"></div>
+      <div class="onb-nav"><button class="onb-link" data-go="1">← Back</button></div>
+    </div>
+    <!-- STEP 3: DETAILS -->
+    <div class="onb-step" data-step="3">
+      <h2 id="pTitle">Create your profile</h2>
+      <p class="onb-sub" id="pSubtitle">Pick an avatar and tell us a little about you.</p>
+      <div class="onb-avatars" id="avatarPick"></div>
+      <div class="field"><label id="pNickLbl">Nickname</label><input id="pNick" placeholder="e.g. Maths Ninja"></div>
+      <div class="onb-row" id="pStudentRow">
+        <div class="field" style="flex:1;min-width:130px"><label>Class / Section</label><input id="pClass" placeholder="e.g. SS1 B"></div>
+        <div class="field" style="flex:1;min-width:130px"><label>Favourite subject</label><select id="pFav"></select></div>
+      </div>
+      <div class="field" id="pSchoolField"><label id="pSchoolLbl">School (optional)</label><input id="pSchool" placeholder="Your school"></div>
+      <div class="field"><label>Email</label><input id="pEmail" type="email" placeholder="you@example.com"></div>
+      <div class="field"><label>Password</label><input id="pPass" type="password" placeholder="At least 8 characters"></div>
+      <p class="onb-sub" style="font-size:12px;margin:-2px 0 0">Min 8 characters — include a capital letter, a number and a special character (e.g. <b>Abc123$!</b>).</p>
+      <p class="onb-err" id="pErr"></p>
+      <div class="onb-nav"><button class="onb-link" id="pBack" data-go="2">← Back</button><button class="btn" id="obToTheme">Next →</button></div>
+    </div>
+    <!-- STEP INTEREST QUIZ (students) -->
+    <div class="onb-step" data-step="interest">
+      <h2 id="quizTitle">Quick interest check ✨</h2>
+      <p class="onb-sub" id="quizSub">Three taps so we can show you the right stuff first.</p>
+      <div id="quizWrap"></div>
+    </div>
+    <!-- STEP 4: THEME -->
+    <div class="onb-step" data-step="4">
+      <h2>Pick your vibe 🎨</h2>
+      <p class="onb-sub">Tap a theme — you can change it anytime in Profile.</p>
+      <div class="onb-themes" id="themePick"></div>
+      <div class="onb-nav"><button class="onb-link" data-go="3">← Back</button><button class="btn" id="obToRef">Next →</button></div>
+    </div>
+    <!-- STEP 5: REFERRAL -->
+    <div class="onb-step" data-step="5">
+      <h2>Got a friend code? 🎁</h2>
+      <p class="onb-sub">Enter a friend's code to start with bonus points. No code? Just skip it.</p>
+      <div class="field"><label>Friend code (optional)</label><input id="pRef" placeholder="e.g. MAT-7K2Q"></div>
+      <div class="field"><label>Class / assignment code (optional)</label><input id="pClassCode" placeholder="Paste a code from your teacher or parent"></div>
+      <div class="onb-nav"><button class="onb-link" data-go="4">← Back</button><button class="btn gold" id="obFinish">🥚 Start playing</button></div>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="topbar">
+    <div class="brand"><span class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 2.6c-3.8 0-7 5.5-7 10.4a7 7 0 0 0 14 0c0-4.9-3.2-10.4-7-10.4z"/></svg></span> <span class="bn2">Study Egg</span></div>
+    <div class="buddy"><span class="face" id="buddyFace">🥚</span><span class="bn" id="buddyName">Study Egg</span></div>
+    <div class="spacer"></div>
+    <div class="stat"><span class="v fire" id="sStreak">0</span><span class="l">🔥</span></div>
+    <div class="stat"><span class="v gold" id="sCoins">0</span><span class="l">🪙</span></div>
+    <div class="stat"><span class="v" id="sLevel">1</span><span class="l">⭐ Lvl</span></div>
+    <button class="iconbtn hidden" id="backParentBtn" title="Switch to parent" style="width:36px;height:36px">🔙</button>
+    <button class="iconbtn" id="muteBtn" title="Sound on/off">🔊</button>
+  </div>
+
+  <div class="levelbar">
+    <div class="row">
+      <div class="lvlbadge"><span class="ring" id="lvlRing"><span id="lvlNum">1</span></span> <span id="rankName">Novice</span></div>
+      <div class="xptext"><b id="xpCur">0</b> / <span id="xpNext">100</span> XP</div>
+    </div>
+    <div class="bar"><i id="xpFill"></i></div>
+  </div>
+
+  <div class="nav" role="navigation" aria-label="Main">
+    <button class="active" data-view="home"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg><span>Home</span></button>
+    <button class="hidden nav-more-item" id="navDash" data-view="teacher"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg><span>Dashboard</span></button>
+    <button data-view="leaderboard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21h16"/><rect x="5" y="12" width="3.5" height="9" rx="1"/><rect x="10.25" y="5" width="3.5" height="16" rx="1"/><rect x="15.5" y="9" width="3.5" height="12" rx="1"/></svg><span>Ranks</span></button>
+    <button data-view="shop"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 8h14l-1.2 11.1a1 1 0 0 1-1 .9H7.2a1 1 0 0 1-1-.9z"/><path d="M9 8a3 3 0 0 1 6 0"/></svg><span>Shop</span></button>
+    <button data-view="achievements"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 4h8v5a4 4 0 0 1-8 0z"/><path d="M8 6H5a3 3 0 0 0 3 4M16 6h3a3 3 0 0 1-3 4M12 13v4M9 21h6M10 17h4"/></svg><span>Badges</span></button>
+    <button class="nav-more-item" data-view="create"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg><span>Create</span></button>
+    <button data-view="stats"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg><span>Profile</span></button>
+    <button class="nav-more-item" data-view="install"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="7" y="2.5" width="10" height="19" rx="2.5"/><path d="M12 7v7M9 11l3 3 3-3"/></svg><span>Install</span></button>
+    <div class="nav-more-btn" id="navMore" role="button" tabindex="0" aria-label="More"><svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.7"/><circle cx="12" cy="12" r="1.7"/><circle cx="19" cy="12" r="1.7"/></svg><span>More</span></div>
+  </div>
+
+  <!-- HOME -->
+  <div class="view" id="view-home">
+    <div id="heroWrap"></div>
+    <div id="trackBar" class="trackbar"></div>
+    <div class="panel">
+      <h2 class="title">Choose your quest</h2>
+      <p class="sub">Tap a topic → pick <b>Practice</b> or <b>⚔️ Boss Battle</b>. Study Egg uses <b>spaced repetition</b>: questions you miss come back more often, and every answer comes with a quick explanation.</p>
+      <div id="catWrap"></div>
+    </div>
+  </div>
+
+  <!-- QUIZ -->
+  <div class="view hidden" id="view-quiz">
+    <div class="panel">
+      <div class="quizhead">
+        <button class="btn ghost sm" id="quitQuiz">← Exit</button>
+        <button class="iconbtn" id="ttsBtn" title="Read aloud" style="width:34px;height:34px">🔊</button>
+        <div class="qprogress"><div class="bar"><i id="qFill"></i></div></div>
+        <div class="combo" id="comboTag">🔥 x<span id="comboN">1</span></div>
+      </div>
+      <div id="bossWrap" class="hidden">
+        <div class="bossbar">
+          <div class="who"><span id="bossFace">👹</span> <span id="bossName">Boss</span></div>
+          <div class="hpwrap"><div class="hp"><i id="bossHp"></i></div></div>
+          <div class="hearts" id="hearts">❤️❤️❤️</div>
+        </div>
+        <div class="timerbar" id="timerBar"><i id="timerFill"></i></div>
+      </div>
+      <div class="qcard"><div><div class="tag" id="qTag"></div><div class="qtxt" id="qText">…</div></div></div>
+      <div class="opts" id="qOpts"></div>
+      <div class="feed" id="qFeed"></div>
+      <div class="why hidden" id="qWhy"></div>
+    </div>
+  </div>
+
+  <!-- LEADERBOARD -->
+  <div class="view hidden" id="view-leaderboard">
+    <div class="panel">
+      <h2 class="title">🏅 Class Leaderboard</h2>
+      <p class="sub">Race your classmates by total XP. Saved on this device — add real classmates below to track your class.</p>
+      <div class="lb" id="lbList"></div>
+      <hr style="border-color:var(--line);margin:16px 0" />
+      <label>Your display name</label>
+      <div class="typebox"><input id="myName" placeholder="Your name" /><button class="btn sm" id="saveName">Save</button></div>
+      <div style="margin-top:14px">
+        <label>🎁 Add a friend — earn points!</label>
+        <div class="typebox"><input id="cmName" placeholder="Friend's name" /><input id="cmXp" type="number" placeholder="XP" style="max-width:120px" /><button class="btn sm gold" id="addCm">Add</button></div>
+        <p class="sub" style="margin-top:8px;font-size:12px">You earn <b>+20 XP</b> &amp; <b>+10 coins</b> each time you add a friend. Share your code so friends can add you too!</p>
+        <div class="row-actions"><button class="btn sm" onclick="inviteFriend('wa')">📲 Invite via WhatsApp</button><button class="btn ghost sm" onclick="inviteFriend('email')">✉️ Invite via Email</button></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SHOP -->
+  <div class="view hidden" id="view-shop"><div id="shopWrap"></div></div>
+
+  <!-- SUBSCRIBE -->
+  <div class="view hidden" id="view-subscribe"><div id="subWrap"></div></div>
+
+  <!-- PATTERNS -->
+  <div class="view hidden" id="view-patterns"><div id="patWrap"></div></div>
+
+  <!-- LESSONS -->
+  <div class="view hidden" id="view-lessons"><div id="lessonWrap"></div></div>
+
+  <!-- JAMB MOCK -->
+  <div class="view hidden" id="view-mock"><div id="mockWrap"></div></div>
+
+  <!-- CERTIFICATES -->
+  <div class="view hidden" id="view-cert"><div id="certWrap"></div></div>
+
+  <!-- TEACHER / PARENT -->
+  <div class="view hidden" id="view-teacher"><div id="teacherWrap"></div></div>
+
+  <!-- ACHIEVEMENTS -->
+  <div class="view hidden" id="view-achievements">
+    <div class="panel">
+      <h2 class="title">Badges</h2>
+      <p class="sub">Unlock badges as you study. <b id="achCount">0</b> of <span id="achTotal">0</span> earned.</p>
+      <div class="achgrid" id="achGrid"></div>
+    </div>
+  </div>
+
+  <!-- CREATE -->
+  <div class="view hidden" id="view-create">
+    <div class="panel">
+      <h2 class="title">✨ Create a deck with AI</h2>
+      <p class="sub">Snap a photo of past questions or a textbook page (or paste text) and AI turns it into a quiz. Needs your AI function — see <b>AI-SETUP</b>.</p>
+      <div class="field"><label>AI function URL</label><input id="aiUrl" placeholder="https://your-worker.workers.dev" /></div>
+      <div class="row-actions">
+        <label class="btn sm ghost" style="cursor:pointer">📷 Upload image<input id="aiImg" type="file" accept="image/*" style="display:none" /></label>
+        <span class="chip" id="aiImgName">No file</span>
+      </div>
+      <div class="field" style="margin-top:10px"><label>…or paste text</label><textarea id="aiText" rows="3" placeholder="Paste past questions or notes here"></textarea></div>
+      <div class="field"><label>How many questions?</label><input id="aiCount" type="number" value="10" min="3" max="20" style="max-width:120px" /></div>
+      <button class="btn gold block" id="aiGo">✨ Generate questions</button>
+      <p class="sub" id="aiStatus" style="margin-top:8px"></p>
+      <div id="aiPreview"></div>
+    </div>
+    <div class="panel">
+      <h2 class="title">📥 Import a shared deck</h2>
+      <p class="sub">Got a deck code from a friend or teacher? Paste it to add their deck.</p>
+      <div class="typebox"><input id="impCode" placeholder="Paste deck code (SQD-…)" /><button class="btn" id="impGo">Import</button></div>
+    </div>
+    <div class="panel">
+      <h2 class="title">Create / Edit a Deck</h2>
+      <p class="sub">Build a deck for any subject. Mix question types and add an explanation so every answer teaches something.</p>
+      <div class="field"><label>Deck name</label><input id="ndName" placeholder="e.g. Further Maths — Vectors" /></div>
+      <div class="field"><label>Visibility</label><select id="ndPublic"><option value="private">Private (only me)</option><option value="public">Public (share by code)</option></select></div>
+      <div class="row-actions" style="margin-bottom:8px">
+        <input id="ndEmoji" style="width:80px" maxlength="2" placeholder="📚" />
+        <select id="ndPick"><option value="">— or load one of your decks to edit —</option></select>
+      </div>
+      <hr style="border-color:var(--line);margin:14px 0" />
+      <div class="field"><label>Type</label>
+        <select id="fType">
+          <option value="mc">Multiple choice</option>
+          <option value="tf">True / False</option>
+          <option value="type">Type the answer</option>
+        </select>
+      </div>
+      <div class="field"><label>Question</label><input id="fQ" placeholder="What is the SI unit of force?" /></div>
+      <div class="field"><label>Correct answer</label><input id="fA" placeholder="Newton  (for True/False type True or False)" /></div>
+      <div class="field" id="wrongField"><label>Wrong options (comma separated)</label><input id="fW" placeholder="Joule, Watt, Pascal" /></div>
+      <div class="field"><label>Explanation (shown after answering)</label><input id="fE" placeholder="1 N is the force that accelerates 1 kg at 1 m/s²." /></div>
+      <div class="row-actions">
+        <button class="btn" id="addCard">＋ Add question</button>
+        <button class="btn gold" id="saveDeck">💾 Save deck</button>
+      </div>
+      <div class="flashlist" id="draftList"></div>
+    </div>
+  </div>
+
+  <!-- PROFILE -->
+  <div class="view hidden" id="view-stats">
+    <div class="panel">
+      <div class="prof-head">
+        <div class="prof-av" id="pvAvatar">🎓</div>
+        <div class="prof-meta"><b id="pvNick">Player</b><div class="prof-chips" id="pvChips"></div></div>
+      </div>
+    </div>
+    <div class="panel" style="text-align:center">
+      <div style="font-size:64px" id="bigAvatar">🥚</div>
+      <h2 class="title" id="avatarName">Study Egg</h2>
+      <p class="sub" id="avatarHint">Keep studying to climb the ranks.</p>
+    </div>
+    <div class="panel">
+      <h2 class="title">🎨 Theme</h2>
+      <p class="sub">Tap to switch your vibe instantly — it saves to your profile.</p>
+      <div class="onb-themes" id="profThemes"></div>
+    </div>
+    <div class="panel">
+      <h2 class="title">🎁 Invite friends</h2>
+      <p class="sub">Share your code. You earn <b>+20 XP</b> &amp; <b>+10 coins</b> for every friend you add in the Friends tab.</p>
+      <div class="refcode" id="profCode">—</div>
+      <button class="btn sm ghost block" id="copyCode">📋 Copy my code</button>
+    </div>
+    <div class="panel">
+      <h2 class="title">💾 Your Data &amp; Backup</h2>
+      <p class="sub">Your progress is saved <b>on this device</b> by default. Back it up to a file you can keep (e.g. in Google Drive) and restore it anytime, on any phone.</p>
+      <div class="row-actions"><button class="btn sm gold" id="exportData">⬇️ Back up to file</button><label class="btn sm ghost" style="cursor:pointer">⬆️ Restore from file<input id="importData" type="file" accept="application/json" style="display:none"></label></div>
+      <hr style="border-color:var(--line);margin:14px 0" />
+      <h3 style="color:var(--accent2)">☁️ Sync across devices (optional)</h3>
+      <p class="sub">Advanced: connect a free account so your data follows you automatically. See <b>BACKEND-SETUP</b>.</p>
+      <div class="field"><label>Project URL</label><input id="cloudUrl" placeholder="https://xxxx.supabase.co"></div>
+      <div class="field"><label>Anon public key</label><input id="cloudKey" placeholder="eyJhbGciOi..."></div>
+      <button class="btn sm" id="cloudConnect">Connect</button>
+      <button class="btn sm ghost" id="cloudDisconnect">Disconnect</button>
+      <p class="sub" id="cloudStatus" style="margin-top:8px">Saved on this device.</p>
+    </div>
+    <div class="panel">
+      <h2 class="title">Your Progress</h2>
+      <div class="deckgrid">
+        <div class="deck"><div class="emoji">⭐</div><h3 id="stLevel">Level 1</h3><p id="stRank">Novice</p></div>
+        <div class="deck"><div class="emoji">🎯</div><h3 id="stAcc">0%</h3><p>Overall accuracy</p></div>
+        <div class="deck"><div class="emoji">📚</div><h3 id="stAns">0</h3><p>Questions answered</p></div>
+        <div class="deck"><div class="emoji">🧠</div><h3 id="stLearned">0</h3><p>Questions mastered</p></div>
+        <div class="deck"><div class="emoji">🔥</div><h3 id="stStreak">0 days</h3><p>Best: <span id="stBest">0</span></p></div>
+        <div class="deck"><div class="emoji">🪙</div><h3 id="stCoins">0</h3><p>Coins earned</p></div>
+        <div class="deck"><div class="emoji">⚔️</div><h3 id="stBoss">0</h3><p>Bosses defeated</p></div>
+        <div class="deck"><div class="emoji">🎁</div><h3 id="stRef">0</h3><p>Friends referred</p></div>
+        <div class="deck"><div class="emoji">🌟</div><h3 id="stXP">0</h3><p>Total XP earned</p></div>
+      </div>
+      <div class="row-actions" style="margin-top:16px">
+        <button class="btn gold sm" onclick="show('subscribe')">⭐ Premium</button>
+        <button class="btn ghost sm" onclick="show('cert')">🎓 Certificates</button>
+        <button class="btn ghost sm" onclick="show('teacher')">👨‍👩‍👧 Teacher / Parent</button>
+        <button class="btn ghost sm" onclick="shareProgress()">📤 Share my progress</button>
+        <button class="btn ghost sm" id="editProf">✏️ Edit profile</button>
+        <button class="btn ghost sm" id="signOut">🚪 Switch / sign out</button>
+        <button class="btn ghost sm" id="resetBtn">Reset all progress</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- INSTALL -->
+  <div class="view hidden" id="view-install">
+    <div class="panel">
+      <h2 class="title">📱 Install Study Egg on your phone</h2>
+      <p class="sub">Turn Study Egg into a real app icon on your home screen — works offline once installed.</p>
+      <button class="btn block gold" id="installBtn">⬇️ Install app</button>
+      <p class="sub" id="installNote" style="margin-top:14px"></p>
+      <div style="margin-top:10px;line-height:1.7;font-size:14px">
+        <b>On Android (Chrome):</b> tap the <b>⋮</b> menu → <b>Install app</b> / <b>Add to Home screen</b>.<br/>
+        <b>On iPhone (Safari):</b> tap <b>Share ⬆️</b> → <b>Add to Home Screen</b>.<br/>
+        <small style="color:var(--muted)">Install works best when the file is opened from a web link/host. Opened from a file, it still runs fully — your progress always saves.</small>
+      </div>
+    </div>
+  </div>
+
+  <footer>Study Egg • progress saves automatically on your device • built for curious Nigerian students 💜🇳🇬</footer>
+</div>
+
+<!-- MODE MODAL -->
+<div class="modal" id="modeModal"><div class="box">
+  <div class="big" id="modeEmoji">📚</div>
+  <h2 id="modeTitle">Deck</h2>
+  <p class="sub" id="modeSub"></p>
+  <div class="lvlsel" id="lvlSel"></div>
+  <div class="onb-sub" id="lvlNote" style="margin:4px 0 0"></div>
+  <div class="modechoice">
+    <div class="modecard" id="modePractice"><span class="mi">🧠</span><div><b>Practice</b><p>Learn at your pace, no timer. Weak questions come back more often.</p></div></div>
+    <div class="modecard" id="modeBoss"><span class="mi">⚔️</span><div><b>Boss Battle</b><p>Beat the clock & defeat the boss. Double XP, 3 lives!</p></div></div>
+  </div>
+  <button class="btn ghost block" style="margin-top:12px" onclick="closeModal('modeModal')">Cancel</button>
+</div></div>
+
+<!-- POPUP MODAL -->
+<div class="modal" id="luModal"><div class="box">
+  <div class="big" id="luIcon">🎉</div>
+  <h2 id="luTitle">Level Up!</h2>
+  <p id="luText" class="sub" style="margin:8px 0 18px"></p>
+  <button class="btn block" onclick="closeModal('luModal')">Keep going!</button>
+</div></div>
+
+<script src="js/01-questions-bank.js" data-inline></script>
+<script src="js/02-content.js" data-inline></script>
+
+<script src="js/03-themes.js" data-inline></script>
+
+<script src="js/04-cloud-backend-supabase-optional-graceful.js" data-inline></script>
+
+<script src="js/05-coin-shop.js" data-inline></script>
+
+<script src="js/06-free-craft-patterns.js" data-inline></script>
+
+<script src="js/07-mock-certificates-read-aloud-paystack.js" data-inline></script>
+
+<script src="js/08-teacher-parent-invite-backup.js" data-inline></script>
+
+<script src="js/09-ai-deck-creation-deck-sharing.js" data-inline></script>
+
+<script src="js/10-career-mini-lessons.js" data-inline></script>
+<script src="js/11-extra-track-mini-lessons-study-egg.js" data-inline></script>
+
+<script src="js/12-study-egg-midnight-focus-add-ons.js" data-inline></script>
+</body>
+</html>
